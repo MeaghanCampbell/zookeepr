@@ -11,6 +11,9 @@ const app = express()
 app.use(express.urlencoded({ extended: true}))
 // parse incoming JSON data
 app.use(express.json())
+// middleware to instruct server to access all front end code without having to create a specific endpoint for each resource
+// shows css & images js etc, not just html 
+app.use(express.static('public'))
 
 function filterByQuery(query, animalsArray) {
     let personalityTraitsArray = [];
@@ -112,7 +115,26 @@ app.post('/api/animals', (req, res) => {
   }
 });
 
-// tell app to listen for requests
+// '/' brings us to the route of the server, and connects index.html, middle ware up top connects css, js and images
+// you can see this HTML by visiting http://localhost:3001 in browser
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, './public/index.html'));
+});
+
+// connects animals.html
+// note this route doesn't have api in it because it deals serving an HTML page not JSON
+// you can see this by visiting http://localhost:3001/animals because of the route we created
+app.get('/animals', (req, res) => {
+  res.sendFile(path.join(__dirname, './public/animals.html'))
+})
+
+// connects zookeepers.html
+app.get('/zookeepers', (req, res) => {
+  res.sendFile(path.join(__dirname, './public/zookeepers.html'));
+});
+
+// tell app to listen for requests - should always be last
+// path ensures that we are finding correct location for HTML code we want displayed
 app.listen(PORT, () => {
     console.log(`API server now on port ${PORT}!`)
 })
